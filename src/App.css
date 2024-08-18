@@ -74,7 +74,7 @@ main{
 .delete{
     background-color: red;
 }
-.taskContainer > input{
+.taskContainer > [type='text']{
     display: flex;
     align-items: center;
     padding: 5px;

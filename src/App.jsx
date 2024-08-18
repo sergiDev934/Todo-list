@@ -10,8 +10,9 @@ export default function App () {
   }
 
   const submitNewTask = e => {
+    e.preventDefault()
+
     if (title !== '') {
-      e.preventDefault()
       const newTask = {
         id: Date.now(),
         title
@@ -24,35 +25,43 @@ export default function App () {
   }
   const handleDelete = id => {
     const newTasks = tasks.filter(task => task.id !== id)
-    console.log(newTasks)
+    setTasks(newTasks)
+  }
+  const handleUpdate = (id, newTitle) => {
+    const newTasks = tasks.map(task => {
+      if (task.id === id) {
+        task.title = newTitle
+      }
+      return task
+    })
+    setTasks(newTasks)
   }
 
-  const onUpdate = () => {
-  }
-
-  const TaskContainer = ({ task, title, onDeleteTask, onEditTask, onUpdate }) => {
+  const TaskContainer = ({ task, title, onDeleteTask, onUpdateTask }) => {
     const [edit, setEdit] = useState(false)
+    const [titleInside, setTitleInside] = useState(title)
 
-    const handleUpdate = () => {
-      setEdit(!edit)
-    }
-    const handleDelete = e => {
+    const onHandleDelete = () => {
       onDeleteTask(task.id)
+    }
+    const onHandleUpdate = () => {
+      onUpdateTask(task.id, titleInside)
+      setEdit(!edit)
     }
 
     return (
       edit
         ? (
-          <form className='taskContainer'>
-            <input type='text' value={title} />
-            <button onClick={() => handleUpdate()} className='taskContainer__btn edit'>Update</button>
-          </form>
+          <div className='taskContainer'>
+            <input type='text' defaultValue={titleInside} onInput={e => setTitleInside(e.target.value)} />
+            <input type='Submit' onClick={() => onHandleUpdate()} className='taskContainer__btn edit' defaultValue='Update' />
+          </div>
           )
         : (
           <div className='taskContainer'>
-            <span>{title}</span>
+            <span>{titleInside}</span>
             <button onClick={() => setEdit(!edit)} className='taskContainer__btn edit'>Edit</button>
-            <button onClick={e => handleDelete(e)} className='taskContainer__btn delete'>Delete</button>
+            <button onClick={e => onHandleDelete()} className='taskContainer__btn delete'>Delete</button>
           </div>
           )
     )
@@ -63,7 +72,7 @@ export default function App () {
       <h1>Todo List App</h1>
       <form className='form' onSubmit={submitNewTask}>
         <input type='text' className='input' onChange={updateTextInput} value={title} />
-        <input type='Submit' className='button' value='Create Task' />
+        <input type='Submit' className='button' defaultValue='Create Task' />
       </form>
       <section className='todoContainer'>
         {
@@ -75,9 +84,7 @@ export default function App () {
                 task={task}
                 title={task.title}
                 onDeleteTask={handleDelete}
-                // TODO: PONER BIEN LAS FUNCIONES
-                onEditTask
-                onUpdate
+                onUpdateTask={handleUpdate}
               />
             )
           })
